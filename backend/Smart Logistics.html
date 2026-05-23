@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Logistics Tracker</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: white;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            width: 300px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #007bff;
+        }
+
+        .alert {
+            color: red;
+            font-weight: bold;
+        }
+
+        .normal {
+            color: green;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <h1>📦 Smart Logistics Tracker</h1>
+
+    <div class="card">
+        <h3>Shipment Info</h3>
+        <p><b>ID:</b> SHP001</p>
+        <p><b>Status:</b> In Transit</p>
+        <button onclick="showData()">Update Data</button>
+    </div>
+
+    <div class="card">
+        <h3>📍 Location</h3>
+        <p id="location">--</p>
+    </div>
+
+    <div class="card">
+        <h3>🌡️ Environment</h3>
+        <p id="temp">--</p>
+        <p id="humidity">--</p>
+        <p id="alertMsg"></p>
+    </div>
+
+    <script>
+        function showData() {
+
+            var lat = (18 + Math.random()).toFixed(3);
+            var lon = (73 + Math.random()).toFixed(3);
+
+            var temp = Math.floor(Math.random() * 50);
+            var hum = Math.floor(Math.random() * 100);
+
+            document.getElementById("location").innerHTML =
+                "Lat: " + lat + " | Lon: " + lon;
+
+            document.getElementById("temp").innerHTML =
+                "Temperature: " + temp + " °C";
+
+            document.getElementById("humidity").innerHTML =
+                "Humidity: " + hum + " %";
+
+            if (temp > 35) {
+                document.getElementById("alertMsg").innerHTML =
+                    "⚠️ High Temperature!";
+                document.getElementById("alertMsg").className = "alert";
+            } else {
+                document.getElementById("alertMsg").innerHTML =
+                    "All conditions normal";
+                document.getElementById("alertMsg").className = "normal";
+            }
+        }
+    </script>
+
+</body>
+</html>

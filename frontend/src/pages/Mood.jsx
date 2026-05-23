@@ -14,11 +14,11 @@ export default function Mood() {
   });
 
   const moods = [
-    { value: 'happy', emoji: '😊', color: '#f0b429' },
-    { value: 'neutral', emoji: '😐', color: '#38c98a' },
-    { value: 'sad', emoji: '😢', color: '#7c6ff7' },
-    { value: 'anxious', emoji: '😰', color: '#a0a0a0' },
-    { value: 'angry', emoji: '😤', color: '#e85d4a' }
+    { value: 'happy', emoji: '😊', color: '#f0b429', label: 'Happy'},
+    { value: 'neutral', emoji: '😐', color: '#38c98a', label: 'Neutral'},
+    { value: 'sad', emoji: '😢', color: '#7c6ff7', label: 'Sad'},
+    { value: 'anxious', emoji: '😰', color: '#a0a0a0', label: 'Anxious'},
+    { value: 'angry', emoji: '😤', color: '#e85d4a', label: 'Angry' }
   ];
 
   useEffect(() => {
@@ -71,7 +71,10 @@ export default function Mood() {
                   transition: 'all 0.3s ease'
                 }}
               >
-                {m.emoji}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+  <span>{m.emoji}</span>
+  <span style={{ fontSize: '0.75rem', color: 'white', textTransform: 'capitalize' }}>{m.value}</span>
+</div>
               </button>
             ))}
           </div>
