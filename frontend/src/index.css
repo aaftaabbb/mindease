@@ -414,3 +414,11 @@ h1, h2, h3, h4 {
 
 .badge-primary { background: var(--primary-dim); color: var(--primary); }
 .badge-secondary { background: var(--secondary-dim); color: var(--secondary); }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes typingDot {
+  0%, 100% { opacity: 0.4; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
