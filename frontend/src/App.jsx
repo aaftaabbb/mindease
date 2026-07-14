@@ -54,6 +54,9 @@ function App() {
       </div>
       <footer className="footer">
         <p>Disclaimer: MindEase is an AI companion, not a replacement for professional medical advice.</p>
+        <p style={{ marginTop: '8px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          Built by three sleep-deprived students — <strong style={{ color: 'var(--primary)' }}>Aftab, Adarsh & Ambar</strong> 👾
+        </p>
       </footer>
     </Router>
   );
