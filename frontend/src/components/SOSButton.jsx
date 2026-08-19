@@ -17,6 +17,7 @@ export default function SOSButton() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Emergency SOS"
+        className="sos-btn"
         style={{
           position: 'fixed',
           bottom: '24px',

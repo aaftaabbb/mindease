@@ -290,6 +290,11 @@ h1, h2, h3, h4 {
   .bottom-nav { display: none !important; }
 }
 
+/* ── SOS button above bottom nav on mobile ── */
+@media (max-width: 768px) {
+  .sos-btn { bottom: 80px !important; }
+}
+
 /* ── Modals ── */
 .modal-overlay {
   position: fixed;
