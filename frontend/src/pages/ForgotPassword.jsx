@@ -82,9 +82,9 @@ export default function ForgotPassword() {
             <Brain size={26} strokeWidth={2} color="var(--primary)" />
           </div>
           <h1 style={{
-            fontFamily: 'DM Sans, -apple-system, sans-serif',
-            fontSize: '1.8rem', fontWeight: 700,
-            color: 'var(--text)', letterSpacing: '-0.04em',
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontSize: '2rem', fontWeight: 700,
+            color: 'var(--text)', letterSpacing: '-0.02em', fontStyle: 'italic',
           }}>
             Mind<span style={{ color: 'var(--primary)' }}>Ease</span>
           </h1>

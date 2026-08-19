@@ -255,17 +255,18 @@ h1, h2, h3, h4 {
 }
 
 .nav-logo {
-  font-family: 'DM Sans', -apple-system, sans-serif;
-  font-size: 1.25rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.55rem;
   font-weight: 700;
   color: var(--text);
   display: flex;
   align-items: center;
-  gap: 8px;
-  letter-spacing: -0.04em;
+  gap: 10px;
+  letter-spacing: -0.02em;
+  font-style: italic;
 }
 
-.nav-logo span { color: var(--primary); font-weight: 800; }
+.nav-logo span { color: var(--primary); font-weight: 800; font-style: normal; }
 
 /* Hamburger (mobile only) */
 .nav-hamburger {
