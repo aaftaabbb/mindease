@@ -56,7 +56,9 @@ router.post('/message', auth, async (req, res) => {
     res.json({ response, isCrisis: false });
   } catch (err) {
     console.error('Chat error:', err);
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) {
+      res.status(500).json({ msg: 'Server error' });
+    }
   }
 });
 
@@ -65,7 +67,7 @@ router.get('/history', auth, async (req, res) => {
     const chat = await Chat.findOne({ user: req.user.id });
     res.json(chat ? chat.messages.slice(-20) : []);
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -74,7 +76,7 @@ router.delete('/clear', auth, async (req, res) => {
     await Chat.findOneAndUpdate({ user: req.user.id }, { messages: [] });
     res.json({ msg: 'Chat cleared' });
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 

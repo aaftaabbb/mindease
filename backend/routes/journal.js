@@ -42,7 +42,7 @@ router.post('/', auth, async (req, res) => {
     res.status(201).json(entry);
   } catch (err) {
     console.error('Journal error:', err);
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -61,7 +61,7 @@ router.get('/', auth, async (req, res) => {
 
     res.json({ entries, total, pages: Math.ceil(total / limit) });
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -71,7 +71,7 @@ router.get('/:id', auth, async (req, res) => {
     if (!entry) return res.status(404).json({ msg: 'Entry not found' });
     res.json(entry);
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -81,7 +81,7 @@ router.delete('/:id', auth, async (req, res) => {
     if (!entry) return res.status(404).json({ msg: 'Entry not found' });
     res.json({ msg: 'Entry deleted' });
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
