@@ -41,7 +41,7 @@ router.post('/message', auth, async (req, res) => {
         ...recentMessages,
         { role: 'user', content: message }
       ],
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       max_tokens: 150,
       temperature: 0.7
     });
