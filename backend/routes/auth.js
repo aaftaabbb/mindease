@@ -27,7 +27,7 @@ router.post('/send-otp', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   try {
-    const { name, phone, password, otp } = req.body;
+    const { name, phone, email, password, otp } = req.body;
     if (!name || !validateName(name)) {
       return res.status(400).json({ msg: 'Name must be at least 2 characters' });
     }
@@ -45,11 +45,11 @@ router.post('/register', async (req, res) => {
     if (otpDoc.expiresAt < new Date()) return res.status(400).json({ msg: 'OTP expired' });
     const exists = await User.findOne({ phone });
     if (exists) return res.status(400).json({ msg: 'Phone already registered' });
-    
-    const user = await User.create({ name, phone, password, isVerified: true });
+
+    const user = await User.create({ name, phone, email: email || '', password, isVerified: true });
     await OTP.deleteMany({ phone });
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.status(201).json({ token, user: { id: user._id, name: user.name, phone: user.phone, role: user.role } });
+    res.status(201).json({ token, user: { id: user._id, name: user.name, phone: user.phone, email: user.email, role: user.role } });
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });
   }
@@ -69,7 +69,7 @@ router.post('/login', async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ msg: 'Wrong password' });
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, name: user.name, phone: user.phone, role: user.role } });
+    res.json({ token, user: { id: user._id, name: user.name, phone: user.phone, email: user.email, role: user.role } });
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });
   }

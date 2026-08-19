@@ -2,6 +2,8 @@ const router = require('express').Router();
 const auth = require('../middleware/auth');
 const Booking = require('../models/Booking');
 const Clinic = require('../models/Clinic');
+const User = require('../models/User');
+const { sendBookingConfirmation, sendBookingCancellation } = require('../utils/email');
 
 router.post('/', auth, async (req, res) => {
   try {
@@ -41,6 +43,20 @@ router.post('/', auth, async (req, res) => {
     });
 
     const populated = await booking.populate('clinic', 'name city phone type');
+
+    const user = await User.findById(req.user.id);
+    if (user && user.email) {
+      sendBookingConfirmation({
+        to: user.email,
+        userName: user.name,
+        clinicName: clinic.name,
+        city: clinic.city,
+        date: bookingDate,
+        time,
+        reason: reason || ''
+      }).catch(err => console.error('Email send failed:', err.message));
+    }
+
     res.status(201).json(populated);
   } catch (err) {
     console.error('Booking error:', err);
@@ -65,8 +81,20 @@ router.delete('/:id', auth, async (req, res) => {
       { _id: req.params.id, user: req.user.id, status: 'pending' },
       { status: 'cancelled' },
       { new: true }
-    );
+    ).populate('clinic', 'name city');
     if (!booking) return res.status(404).json({ msg: 'Booking not found or cannot be cancelled' });
+
+    const user = await User.findById(req.user.id);
+    if (user && user.email) {
+      sendBookingCancellation({
+        to: user.email,
+        userName: user.name,
+        clinicName: booking.clinic.name,
+        date: booking.date,
+        time: booking.time
+      }).catch(err => console.error('Email send failed:', err.message));
+    }
+
     res.json({ msg: 'Booking cancelled', booking });
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });

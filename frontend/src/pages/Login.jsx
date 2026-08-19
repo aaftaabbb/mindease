@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Heart, Phone, Lock, User, ArrowRight, Loader, ChevronLeft } from 'lucide-react';
+import { Heart, Phone, Lock, User, ArrowRight, Loader, ChevronLeft, Mail } from 'lucide-react';
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,8 +19,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true); setError('');
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, { phone });
-      alert(`Demo OTP: ${res.data.otp}`);
+      await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, { phone });
       setOtpSent(true);
     } catch (err) {
       setError(err.response?.data?.msg || 'Error sending OTP');
@@ -30,7 +30,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true); setError('');
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, { name, phone, password, otp });
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, { name, phone, email, password, otp });
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('role', res.data.user.role);
       window.dispatchEvent(new Event('storage'));
@@ -189,6 +189,8 @@ export default function Login() {
                 value={name} onChange={e => setName(e.target.value)} placeholder="Your name" />
               <InputField icon={<Phone size={16} />} label="Phone Number" type="text"
                 value={phone} onChange={e => setPhone(e.target.value)} placeholder="Enter phone number" />
+              <InputField icon={<Mail size={16} />} label="Email (for booking notifications)" type="email"
+                value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" />
               <InputField icon={<Lock size={16} />} label="Password" type="password"
                 value={password} onChange={e => setPassword(e.target.value)} placeholder="Create a password" />
               <SubmitBtn loading={loading} label="Send OTP" />
