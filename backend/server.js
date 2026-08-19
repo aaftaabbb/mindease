@@ -102,7 +102,12 @@ async function seedData() {
   }
 
   const articleCount = await Article.countDocuments();
-  if (articleCount === 0) {
+  const hasOldArticles = await Article.findOne({ slug: 'understanding-anxiety' });
+  if (hasOldArticles) {
+    await Article.deleteMany({});
+    console.log('Old articles cleared');
+  }
+  if (articleCount === 0 || hasOldArticles) {
     await Article.insertMany([
       {
         title: 'Anxiety in College: What NIMH Wants You to Know',
