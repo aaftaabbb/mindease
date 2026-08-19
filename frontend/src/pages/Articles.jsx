@@ -20,8 +20,18 @@ export default function Articles() {
   const [category, setCategory] = useState('');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [articleLoading, setArticleLoading] = useState(false);
 
   useEffect(() => { fetchArticles(); }, [category, search]);
+
+  const openArticle = async (article) => {
+    setArticleLoading(true);
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/articles/${article.slug}`);
+      setSelected(res.data);
+    } catch (err) { console.error(err); }
+    finally { setArticleLoading(false); }
+  };
 
   const fetchArticles = async () => {
     setLoading(true);
@@ -76,9 +86,13 @@ export default function Articles() {
             lineHeight: 1.8,
             color: 'var(--text)',
           }}>
-            <div dangerouslySetInnerHTML={{ __html: selected.content }} style={{
-              fontSize: '0.95rem',
-            }} />
+            {articleLoading ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>Loading...</div>
+            ) : (
+              <div dangerouslySetInnerHTML={{ __html: selected.content }} style={{
+                fontSize: '0.95rem',
+              }} />
+            )}
           </div>
 
           {selected.tags?.length > 0 && (
@@ -155,7 +169,7 @@ export default function Articles() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
           {articles.map(article => (
-            <div key={article._id} onClick={() => setSelected(article)} className="fade-in" style={{
+            <div key={article._id} onClick={() => openArticle(article)} className="fade-in" style={{
               background: 'var(--surface)', border: '1px solid var(--glass-border)',
               borderRadius: 'var(--radius-xl)', padding: '24px',
               cursor: 'pointer', transition: 'all 0.25s',
