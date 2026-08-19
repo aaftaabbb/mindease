@@ -36,7 +36,7 @@ router.post('/message', auth, async (req, res) => {
     }));
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.6-flash',
       systemInstruction: 'You are MindEase, a warm empathetic AI mental wellness companion for Indian college students. Give short 2-3 sentence supportive responses. Use simple language. Occasionally use Hindi words like yaar or sab theek hoga. Never claim to be a doctor. Remember the conversation context.'
     });
 
