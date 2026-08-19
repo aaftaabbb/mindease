@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import SOSButton from './components/SOSButton';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Chat from './pages/Chat';
@@ -8,6 +9,7 @@ import Mood from './pages/Mood';
 import Breathing from './pages/Breathing';
 import Affirmations from './pages/Affirmations';
 import Clinics from './pages/Clinics';
+import Journal from './pages/Journal';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCrisis from './pages/admin/AdminCrisis';
@@ -45,6 +47,7 @@ function App() {
           <Route path="/breathing" element={<ProtectedRoute token={token} userRole={userRole}><Breathing /></ProtectedRoute>} />
           <Route path="/affirmations" element={<ProtectedRoute token={token} userRole={userRole}><Affirmations /></ProtectedRoute>} />
           <Route path="/clinics" element={<ProtectedRoute token={token} userRole={userRole}><Clinics /></ProtectedRoute>} />
+          <Route path="/journal" element={<ProtectedRoute token={token} userRole={userRole}><Journal /></ProtectedRoute>} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<ProtectedRoute token={token} userRole={userRole} roleRequired="admin"><AdminDashboard /></ProtectedRoute>} />
@@ -58,6 +61,7 @@ function App() {
           Built by three sleep-deprived students — <strong style={{ color: 'var(--primary)' }}>Aftab, Adarsh & Ambar</strong> 👾
         </p>
       </footer>
+      <SOSButton />
     </Router>
   );
 }

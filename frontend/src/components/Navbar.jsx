@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Heart, MessageCircle, BarChart2, Wind, Sparkles, Building, LogOut, LayoutDashboard, Users, AlertOctagon, Menu, X } from 'lucide-react';
+import { Heart, MessageCircle, BarChart2, Wind, Sparkles, Building, BookOpen, LogOut, LayoutDashboard, Users, AlertOctagon, Menu, X } from 'lucide-react';
 
 export default function Navbar({ token, userRole }) {
   const navigate = useNavigate();
@@ -32,6 +32,7 @@ export default function Navbar({ token, userRole }) {
             <>
               <Link to="/chat"         className={`nav-link ${isActive('/chat')}`}         onClick={close}><MessageCircle size={16}/> Chat</Link>
               <Link to="/mood"         className={`nav-link ${isActive('/mood')}`}         onClick={close}><BarChart2 size={16}/> Mood</Link>
+              <Link to="/journal"      className={`nav-link ${isActive('/journal')}`}      onClick={close}><BookOpen size={16}/> Journal</Link>
               <Link to="/breathing"    className={`nav-link ${isActive('/breathing')}`}    onClick={close}><Wind size={16}/> Breathe</Link>
               <Link to="/affirmations" className={`nav-link ${isActive('/affirmations')}`} onClick={close}><Sparkles size={16}/> Affirmations</Link>
               <Link to="/clinics"      className={`nav-link ${isActive('/clinics')}`}      onClick={close}><Building size={16}/> Clinics</Link>

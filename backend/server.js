@@ -52,11 +52,13 @@ app.use(generalLimiter);
 app.use('/api/auth', authLimiter);
 app.use('/api/chat', chatLimiter);
 
-app.use('/api/auth',   require('./routes/auth'));
-app.use('/api/chat',   require('./routes/chat'));
-app.use('/api/mood',   require('./routes/mood'));
-app.use('/api/clinic', require('./routes/clinic'));
-app.use('/api/admin',  require('./routes/admin'));
+app.use('/api/auth',     require('./routes/auth'));
+app.use('/api/chat',     require('./routes/chat'));
+app.use('/api/mood',     require('./routes/mood'));
+app.use('/api/journal',  require('./routes/journal'));
+app.use('/api/clinic',   require('./routes/clinic'));
+app.use('/api/booking',  require('./routes/booking'));
+app.use('/api/admin',    require('./routes/admin'));
 
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
