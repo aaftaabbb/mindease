@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Heart, Phone, Lock, User, ArrowRight, Loader, ChevronLeft, Mail, Eye, EyeOff, Check, X, Shield } from 'lucide-react';
 
@@ -218,6 +218,14 @@ export default function Login() {
                 show={showPassword} toggleShow={() => setShowPassword(!showPassword)}
                 placeholder="Enter your password"
               />
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-6px' }}>
+                <Link to="/forgot-password" style={{
+                  color: 'var(--primary)', fontSize: '0.82rem', fontWeight: 500,
+                  textDecoration: 'none', transition: 'opacity 0.2s',
+                }}>
+                  Forgot Password?
+                </Link>
+              </div>
               <SubmitBtn loading={loading} label="Sign In" />
             </form>
           )}

@@ -75,4 +75,54 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone || !validatePhone(phone)) {
+      return res.status(400).json({ msg: 'Valid 10-digit phone number required' });
+    }
+    const user = await User.findOne({ phone });
+    if (!user) return res.status(400).json({ msg: 'No account found with this phone' });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    await OTP.deleteMany({ phone });
+    await OTP.create({ phone, otp, expiresAt });
+    console.log('Reset OTP for ' + phone + ': ' + otp);
+    res.json({ msg: 'OTP sent for password reset' });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { phone, otp, newPassword } = req.body;
+    if (!phone || !validatePhone(phone)) {
+      return res.status(400).json({ msg: 'Valid 10-digit phone number required' });
+    }
+    if (!otp || typeof otp !== 'string' || otp.length !== 6) {
+      return res.status(400).json({ msg: 'Valid 6-digit OTP required' });
+    }
+    if (!newPassword || !validatePassword(newPassword)) {
+      return res.status(400).json({ msg: 'Password must be at least 6 characters' });
+    }
+
+    const otpDoc = await OTP.findOne({ phone, otp });
+    if (!otpDoc) return res.status(400).json({ msg: 'Invalid OTP' });
+    if (otpDoc.expiresAt < new Date()) return res.status(400).json({ msg: 'OTP expired' });
+
+    const user = await User.findOne({ phone });
+    if (!user) return res.status(400).json({ msg: 'User not found' });
+
+    user.password = newPassword;
+    await user.save();
+    await OTP.deleteMany({ phone });
+
+    res.json({ msg: 'Password reset successful. You can now login.' });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
 module.exports = router;

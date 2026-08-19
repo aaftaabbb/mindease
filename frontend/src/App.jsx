@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import SOSButton from './components/SOSButton';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
 import Chat from './pages/Chat';
 import Mood from './pages/Mood';
 import Breathing from './pages/Breathing';
@@ -40,6 +41,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           
           {/* User Routes */}
           <Route path="/chat" element={<ProtectedRoute token={token} userRole={userRole}><Chat /></ProtectedRoute>} />
