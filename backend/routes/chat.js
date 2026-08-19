@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const auth = require('../middleware/auth');
 const Chat = require('../models/Chat');
-const Groq = require('groq-sdk');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const CRISIS_KEYWORDS = ['suicide','kill myself','end my life','self harm','hurt myself','hopeless','cant go on','want to die','no point','jeena nahi'];
 
@@ -35,18 +35,20 @@ router.post('/message', auth, async (req, res) => {
       content: m.content
     }));
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        { role: 'system', content: 'You are MindEase, a warm empathetic AI mental wellness companion for Indian college students. Give short 2-3 sentence supportive responses. Use simple language. Occasionally use Hindi words like yaar or sab theek hoga. Never claim to be a doctor. Remember the conversation context.' },
-        ...recentMessages,
-        { role: 'user', content: message }
-      ],
-      model: 'llama-3.1-8b-instant',
-      max_tokens: 150,
-      temperature: 0.7
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash',
+      systemInstruction: 'You are MindEase, a warm empathetic AI mental wellness companion for Indian college students. Give short 2-3 sentence supportive responses. Use simple language. Occasionally use Hindi words like yaar or sab theek hoga. Never claim to be a doctor. Remember the conversation context.'
     });
 
-    const response = completion.choices[0].message.content;
+    const history = recentMessages.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+
+    const chatSession = model.startChat({ history });
+    const result = await chatSession.sendMessage(message);
+    const response = result.response.text();
+
     chat.messages.push({ role: 'user', content: message, isCrisis: false });
     chat.messages.push({ role: 'assistant', content: response, isCrisis: false });
     await chat.save();
