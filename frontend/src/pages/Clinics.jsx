@@ -14,6 +14,7 @@ export default function Clinics() {
   const [bookTime, setBookTime] = useState('');
   const [bookReason, setBookReason] = useState('');
   const [bookPhone, setBookPhone] = useState('');
+  const [bookEmail, setBookEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -48,14 +49,15 @@ export default function Clinics() {
         date: bookDate,
         time: bookTime,
         reason: bookReason,
-        phone: bookPhone
+        phone: bookPhone,
+        email: bookEmail
       });
       setSuccess(true);
       fetchBookings();
       setTimeout(() => {
         setShowBooking(null);
         setSuccess(false);
-        setBookDate(''); setBookTime(''); setBookReason(''); setBookPhone('');
+        setBookDate(''); setBookTime(''); setBookReason(''); setBookPhone(''); setBookEmail('');
       }, 2000);
     } catch (err) {
       alert(err.response?.data?.msg || 'Booking failed');
@@ -178,7 +180,7 @@ export default function Clinics() {
                 <PhoneCall size={14} /> Call
               </a>
               {clinic.type !== 'helpline' && (
-                <button onClick={() => { setShowBooking(clinic); setBookPhone(''); }}
+                <button onClick={() => { setShowBooking(clinic); setBookPhone(''); setBookEmail(''); }}
                   style={{
                     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                     padding: '10px', borderRadius: '50px',
@@ -223,6 +225,11 @@ export default function Clinics() {
 
                 <form onSubmit={handleBook} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-soft)' }}>Your Email</label>
+                    <input type="email" value={bookEmail} onChange={e => setBookEmail(e.target.value)} placeholder="your@email.com" required
+                      style={{ width: '100%', padding: '11px 14px', background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-sm)', color: 'var(--text)', fontSize: '0.9rem', fontFamily: 'inherit', outline: 'none' }} />
+                  </div>
+                  <div>
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-soft)' }}>Your Phone</label>
                     <input type="text" value={bookPhone} onChange={e => setBookPhone(e.target.value)} placeholder="10-digit phone" required
                       pattern="\d{10}" maxLength={10}
@@ -254,7 +261,7 @@ export default function Clinics() {
                     <textarea rows="2" value={bookReason} onChange={e => setBookReason(e.target.value)} placeholder="Brief description..."
                       style={{ width: '100%', padding: '11px 14px', background: 'var(--surface-2)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-sm)', color: 'var(--text)', fontSize: '0.9rem', fontFamily: 'inherit', outline: 'none', resize: 'vertical', lineHeight: 1.5 }} />
                   </div>
-                  <button type="submit" disabled={loading || !bookTime}
+                  <button type="submit" disabled={loading || !bookTime || !bookEmail}
                     style={{
                       width: '100%', padding: '13px',
                       background: loading || !bookTime ? 'var(--surface-3)' : 'linear-gradient(135deg, var(--primary), #7b6de0)',

@@ -7,12 +7,15 @@ const { sendBookingConfirmation, sendBookingCancellation } = require('../utils/e
 
 router.post('/', auth, async (req, res) => {
   try {
-    const { clinicId, date, time, reason, phone } = req.body;
+    const { clinicId, date, time, reason, phone, email } = req.body;
 
     if (!clinicId) return res.status(400).json({ msg: 'Clinic required' });
     if (!date) return res.status(400).json({ msg: 'Date required' });
     if (!time) return res.status(400).json({ msg: 'Time required' });
     if (!phone || typeof phone !== 'string') return res.status(400).json({ msg: 'Phone required' });
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ msg: 'Valid email required' });
+    }
 
     const clinic = await Clinic.findById(clinicId);
     if (!clinic) return res.status(404).json({ msg: 'Clinic not found' });
@@ -39,23 +42,22 @@ router.post('/', auth, async (req, res) => {
       time,
       reason: reason || '',
       phone,
+      email,
       status: 'pending'
     });
 
     const populated = await booking.populate('clinic', 'name city phone type');
 
     const user = await User.findById(req.user.id);
-    if (user && user.email) {
-      sendBookingConfirmation({
-        to: user.email,
-        userName: user.name,
-        clinicName: clinic.name,
-        city: clinic.city,
-        date: bookingDate,
-        time,
-        reason: reason || ''
-      }).catch(err => console.error('Email send failed:', err.message));
-    }
+    sendBookingConfirmation({
+      to: email,
+      userName: user ? user.name : 'User',
+      clinicName: clinic.name,
+      city: clinic.city,
+      date: bookingDate,
+      time,
+      reason: reason || ''
+    }).catch(err => console.error('Email send failed:', err.message));
 
     res.status(201).json(populated);
   } catch (err) {
@@ -84,11 +86,10 @@ router.delete('/:id', auth, async (req, res) => {
     ).populate('clinic', 'name city');
     if (!booking) return res.status(404).json({ msg: 'Booking not found or cannot be cancelled' });
 
-    const user = await User.findById(req.user.id);
-    if (user && user.email) {
+    if (booking.email) {
       sendBookingCancellation({
-        to: user.email,
-        userName: user.name,
+        to: booking.email,
+        userName: 'User',
         clinicName: booking.clinic.name,
         date: booking.date,
         time: booking.time

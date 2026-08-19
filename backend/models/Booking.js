@@ -8,6 +8,7 @@ const BookingSchema = new mongoose.Schema({
   reason:  { type: String, maxlength: 500, default: '' },
   status:  { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' },
   phone:   { type: String, required: true },
+  email:   { type: String, required: true },
   notes:   { type: String, maxlength: 500, default: '' },
 }, { timestamps: true });
 
