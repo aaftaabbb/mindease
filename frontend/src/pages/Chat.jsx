@@ -8,6 +8,7 @@ export default function Chat() {
   const [isTyping, setIsTyping] = useState(false);
   const [showCrisis, setShowCrisis] = useState(false);
   const messagesEndRef = useRef(null);
+  const MAX_CHARS = 1000;
 
   const token = localStorage.getItem('token');
   const api = axios.create({
@@ -232,8 +233,9 @@ export default function Chat() {
           <input
             type="text"
             value={input}
-            onChange={e => setInput(e.target.value)}
+            onChange={e => setInput(e.target.value.slice(0, MAX_CHARS))}
             placeholder="Share how you're feeling..."
+            maxLength={MAX_CHARS}
             style={{
               flex: 1, background: 'transparent',
               border: 'none', outline: 'none',
@@ -255,9 +257,19 @@ export default function Chat() {
             <Send size={17} color={input.trim() ? 'white' : 'var(--text-muted)'} />
           </button>
         </form>
-        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.72rem', marginTop: '10px' }}>
-          MindEase is an AI companion, not a replacement for professional help.
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+            MindEase is an AI companion, not a replacement for professional help.
+          </p>
+          {input.length > 0 && (
+            <span style={{
+              fontSize: '0.72rem', fontWeight: 500,
+              color: input.length > MAX_CHARS * 0.9 ? 'var(--crisis)' : 'var(--text-muted)',
+            }}>
+              {input.length}/{MAX_CHARS}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Crisis Modal */}
