@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const auth = require('../middleware/auth');
 const Journal = require('../models/Journal');
-const Groq = require('groq-sdk');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 router.post('/', auth, async (req, res) => {
   try {
@@ -20,16 +20,12 @@ router.post('/', auth, async (req, res) => {
 
     let reflection = '';
     try {
-      const completion = await groq.chat.completions.create({
-        messages: [
-          { role: 'system', content: 'You are a gentle, supportive mental wellness companion. Give a short 1-2 sentence reflection on the user\'s journal entry. Be warm, validating, and encouraging. Use simple language. Sometimes use Hindi words like "sab theek hoga" or "bilkul".' },
-          { role: 'user', content: `My mood: ${mood}\n\nJournal entry: ${content}` }
-        ],
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 100,
-        temperature: 0.7
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        systemInstruction: 'You are a gentle, supportive mental wellness companion. Give a short 1-2 sentence reflection on the user\'s journal entry. Be warm, validating, and encouraging. Use simple language. Sometimes use Hindi words like "sab theek hoga" or "bilkul".'
       });
-      reflection = completion.choices[0].message.content;
+      const result = await model.generateContent(`My mood: ${mood}\n\nJournal entry: ${content}`);
+      reflection = result.response.text();
     } catch (e) {
       reflection = 'Thank you for sharing. Keep writing, it helps! 💜';
     }
