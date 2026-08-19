@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
+import BottomNav from './components/BottomNav';
 import SOSButton from './components/SOSButton';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -38,12 +40,13 @@ function App() {
   return (
     <Router>
       <Navbar token={token} userRole={userRole} />
-      <div className="main-content">
+      {token && <Sidebar token={token} userRole={userRole} />}
+      <div className="main-content" style={token ? { marginLeft: '220px' } : {}}>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          
+
           {/* User Routes */}
           <Route path="/chat" element={<ProtectedRoute token={token} userRole={userRole}><Chat /></ProtectedRoute>} />
           <Route path="/mood" element={<ProtectedRoute token={token} userRole={userRole}><Mood /></ProtectedRoute>} />
@@ -59,12 +62,13 @@ function App() {
           <Route path="/admin/crisis" element={<ProtectedRoute token={token} userRole={userRole} roleRequired="admin"><AdminCrisis /></ProtectedRoute>} />
         </Routes>
       </div>
-      <footer className="footer">
+      <footer className="footer" style={token ? { marginLeft: '220px' } : {}}>
         <p>Disclaimer: MindEase is an AI companion, not a replacement for professional medical advice.</p>
         <p style={{ marginTop: '8px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          Built by three sleep-deprived students — <strong style={{ color: 'var(--primary)' }}>Aftab, Adarsh & Ambar</strong> 👾
+          Built by three sleep-deprived students — <strong style={{ color: 'var(--primary)' }}>Aftab, Adarsh & Ambar</strong>
         </p>
       </footer>
+      {token && <BottomNav />}
       <SOSButton />
     </Router>
   );
