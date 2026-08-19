@@ -10,7 +10,12 @@ const CRISIS_KEYWORDS = ['suicide','kill myself','end my life','self harm','hurt
 router.post('/message', auth, async (req, res) => {
   try {
     const { message } = req.body;
-    if (!message) return res.status(400).json({ msg: 'Message required' });
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      return res.status(400).json({ msg: 'Message required' });
+    }
+    if (message.length > 1000) {
+      return res.status(400).json({ msg: 'Message too long (max 1000 characters)' });
+    }
 
     const isCrisis = CRISIS_KEYWORDS.some(k => message.toLowerCase().includes(k));
 
@@ -25,9 +30,15 @@ router.post('/message', auth, async (req, res) => {
       return res.json({ response: emergencyResponse, isCrisis: true });
     }
 
+    const recentMessages = chat.messages.slice(-10).map(m => ({
+      role: m.role,
+      content: m.content
+    }));
+
     const completion = await groq.chat.completions.create({
       messages: [
-        { role: 'system', content: 'You are MindEase, a warm empathetic AI mental wellness companion for Indian college students. Give short 2-3 sentence supportive responses. Use simple language. Occasionally use Hindi words like yaar or sab theek hoga. Never claim to be a doctor.' },
+        { role: 'system', content: 'You are MindEase, a warm empathetic AI mental wellness companion for Indian college students. Give short 2-3 sentence supportive responses. Use simple language. Occasionally use Hindi words like yaar or sab theek hoga. Never claim to be a doctor. Remember the conversation context.' },
+        ...recentMessages,
         { role: 'user', content: message }
       ],
       model: 'llama-3.3-70b-versatile',

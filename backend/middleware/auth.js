@@ -11,3 +11,10 @@ module.exports = (req, res, next) => {
     res.status(401).json({ msg: 'Invalid token' });
   }
 };
+
+module.exports.adminOnly = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ msg: 'Admin access only' });
+  }
+  next();
+};

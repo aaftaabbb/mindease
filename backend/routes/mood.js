@@ -5,7 +5,14 @@ const MoodLog = require('../models/MoodLog');
 router.post('/', auth, async (req, res) => {
   try {
     const { mood, note } = req.body;
-    const log = await MoodLog.create({ user: req.user.id, mood, note });
+    const validMoods = ['happy', 'sad', 'anxious', 'angry', 'neutral'];
+    if (!mood || !validMoods.includes(mood)) {
+      return res.status(400).json({ msg: 'Valid mood required: happy, sad, anxious, angry, neutral' });
+    }
+    if (note && typeof note !== 'string') {
+      return res.status(400).json({ msg: 'Note must be a string' });
+    }
+    const log = await MoodLog.create({ user: req.user.id, mood, note: note || '' });
     res.status(201).json(log);
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });

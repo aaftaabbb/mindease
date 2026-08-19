@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
@@ -28,6 +29,28 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { msg: 'Too many requests, please try again later.' }
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { msg: 'Too many auth attempts, please try again later.' }
+});
+
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 15,
+  message: { msg: 'Too many messages, please slow down.' }
+});
+
+app.use(generalLimiter);
+app.use('/api/auth', authLimiter);
+app.use('/api/chat', chatLimiter);
 
 app.use('/api/auth',   require('./routes/auth'));
 app.use('/api/chat',   require('./routes/chat'));
@@ -59,17 +82,20 @@ async function seedData() {
     console.log('Clinics seeded');
   }
   
-  const adminExists = await User.findOne({ phone: '9999999999' });
+  const adminPhone = process.env.ADMIN_PHONE || '9999999999';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin1234';
+  
+  const adminExists = await User.findOne({ phone: adminPhone });
   if (!adminExists) {
-    const hashed = await bcrypt.hash('admin1234', 10);
+    const hashed = await bcrypt.hash(adminPassword, 10);
     await User.create({
       name: 'Admin',
-      phone: '9999999999',
+      phone: adminPhone,
       password: hashed,
       role: 'admin',
       isVerified: true
     });
-    console.log('Admin created: 9999999999 / admin1234');
+    console.log('Admin seeded from environment variables');
   }
 }
 

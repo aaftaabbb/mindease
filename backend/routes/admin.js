@@ -1,16 +1,14 @@
 const router = require('express').Router();
 const auth   = require('../middleware/auth');
+const { adminOnly } = require('../middleware/auth');
 const User   = require('../models/User');
 const Chat   = require('../models/Chat');
 
-router.get('/stats', auth, async (req, res) => {
+router.get('/stats', auth, adminOnly, async (req, res) => {
   try {
     const totalUsers = await User.countDocuments({ role: 'user' });
     const totalChats = await Chat.countDocuments();
-    const allChats   = await Chat.find();
-    let crisisCount  = 0;
-    
-    allChats.forEach(c => c.messages.forEach(m => { if (m.isCrisis) crisisCount++; }));
+    const crisisCount = await Chat.countDocuments({ 'messages.isCrisis': true });
     
     res.json({ totalUsers, totalChats, crisisCount });
   } catch (err) {
@@ -18,7 +16,7 @@ router.get('/stats', auth, async (req, res) => {
   }
 });
 
-router.get('/users', auth, async (req, res) => {
+router.get('/users', auth, adminOnly, async (req, res) => {
   try {
     const users = await User.find({ role: 'user' }).select('-password');
     res.json(users);
@@ -27,9 +25,9 @@ router.get('/users', auth, async (req, res) => {
   }
 });
 
-router.get('/crisis', auth, async (req, res) => {
+router.get('/crisis', auth, adminOnly, async (req, res) => {
   try {
-    const chats = await Chat.find().populate('user', 'name phone');
+    const chats = await Chat.find({ 'messages.isCrisis': true }).populate('user', 'name phone');
     const crisis = [];
     chats.forEach(c => {
       c.messages.forEach(m => {

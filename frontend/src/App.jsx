@@ -12,6 +12,12 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCrisis from './pages/admin/AdminCrisis';
 
+function ProtectedRoute({ children, roleRequired, token, userRole }) {
+  if (!token) return <Navigate to="/login" />;
+  if (roleRequired && userRole !== roleRequired) return <Navigate to="/" />;
+  return children;
+}
+
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [userRole, setUserRole] = useState(localStorage.getItem('role'));
@@ -25,12 +31,6 @@ function App() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const ProtectedRoute = ({ children, roleRequired }) => {
-    if (!token) return <Navigate to="/login" />;
-    if (roleRequired && userRole !== roleRequired) return <Navigate to="/" />;
-    return children;
-  };
-
   return (
     <Router>
       <Navbar token={token} userRole={userRole} />
@@ -40,16 +40,16 @@ function App() {
           <Route path="/login" element={<Login />} />
           
           {/* User Routes */}
-          <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-          <Route path="/mood" element={<ProtectedRoute><Mood /></ProtectedRoute>} />
-          <Route path="/breathing" element={<ProtectedRoute><Breathing /></ProtectedRoute>} />
-          <Route path="/affirmations" element={<ProtectedRoute><Affirmations /></ProtectedRoute>} />
-          <Route path="/clinics" element={<ProtectedRoute><Clinics /></ProtectedRoute>} />
+          <Route path="/chat" element={<ProtectedRoute token={token} userRole={userRole}><Chat /></ProtectedRoute>} />
+          <Route path="/mood" element={<ProtectedRoute token={token} userRole={userRole}><Mood /></ProtectedRoute>} />
+          <Route path="/breathing" element={<ProtectedRoute token={token} userRole={userRole}><Breathing /></ProtectedRoute>} />
+          <Route path="/affirmations" element={<ProtectedRoute token={token} userRole={userRole}><Affirmations /></ProtectedRoute>} />
+          <Route path="/clinics" element={<ProtectedRoute token={token} userRole={userRole}><Clinics /></ProtectedRoute>} />
 
           {/* Admin Routes */}
-          <Route path="/admin" element={<ProtectedRoute roleRequired="admin"><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/admin/users" element={<ProtectedRoute roleRequired="admin"><AdminUsers /></ProtectedRoute>} />
-          <Route path="/admin/crisis" element={<ProtectedRoute roleRequired="admin"><AdminCrisis /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute token={token} userRole={userRole} roleRequired="admin"><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute token={token} userRole={userRole} roleRequired="admin"><AdminUsers /></ProtectedRoute>} />
+          <Route path="/admin/crisis" element={<ProtectedRoute token={token} userRole={userRole} roleRequired="admin"><AdminCrisis /></ProtectedRoute>} />
         </Routes>
       </div>
       <footer className="footer">
