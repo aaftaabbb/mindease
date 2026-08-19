@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, Menu, X } from 'lucide-react';
+import { Brain, Menu, X } from 'lucide-react';
 import MobileMenu from './MobileMenu';
 
 export default function Navbar({ token, userRole }) {
@@ -12,7 +12,7 @@ export default function Navbar({ token, userRole }) {
       <div className="container nav-container">
 
         <Link to="/" className="nav-logo" onClick={() => setMenuOpen(false)}>
-          <Heart size={20} fill="var(--primary)" color="var(--primary)" />
+          <Brain size={22} strokeWidth={2.5} color="var(--primary)" />
           Mind<span>Ease</span>
         </Link>
 

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Heart, MessageCircle, BarChart2, Sparkles, Wind, Building, ArrowRight } from 'lucide-react';
+import { Heart, MessageCircle, BarChart2, Sparkles, Wind, Building, ArrowRight, Brain } from 'lucide-react';
 
 const features = [
   {
@@ -76,7 +76,7 @@ export default function Landing() {
             letterSpacing: '0.06em', textTransform: 'uppercase',
             marginBottom: '32px',
           }}>
-            <Heart size={13} fill="var(--primary)" /> For College Students
+            <Brain size={13} strokeWidth={2.5} /> For College Students
           </div>
 
           <h1 style={{
@@ -169,7 +169,7 @@ export default function Landing() {
           padding: 'clamp(40px, 6vw, 64px)',
           textAlign: 'center',
         }}>
-          <Heart size={36} fill="var(--primary)" color="var(--primary)" style={{ margin: '0 auto 20px' }} />
+          <Brain size={36} strokeWidth={2} color="var(--primary)" style={{ margin: '0 auto 20px' }} />
           <h2 style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', marginBottom: '14px' }}>
             Ready to start your journey?
           </h2>

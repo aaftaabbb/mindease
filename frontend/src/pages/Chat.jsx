@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Send, Trash2, Heart, Bot } from 'lucide-react';
+import { Send, Trash2, Brain, Bot } from 'lucide-react';
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -75,7 +75,7 @@ export default function Chat() {
             border: '1px solid rgba(155,140,255,0.3)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <Heart size={17} fill="var(--primary)" color="var(--primary)" />
+            <Brain size={17} strokeWidth={2.5} color="var(--primary)" />
           </div>
           <div>
             <div style={{ fontWeight: 600, fontSize: '0.97rem', color: 'var(--text)' }}>MindEase</div>
@@ -147,7 +147,7 @@ export default function Chat() {
                 border: `1px solid ${msg.isCrisis ? 'rgba(255,123,114,0.3)' : 'rgba(155,140,255,0.3)'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Heart size={13} fill={msg.isCrisis ? 'var(--crisis)' : 'var(--primary)'} color={msg.isCrisis ? 'var(--crisis)' : 'var(--primary)'} />
+                <Brain size={13} strokeWidth={2.5} color={msg.isCrisis ? 'var(--crisis)' : 'var(--primary)'} />
               </div>
             )}
 
@@ -191,7 +191,7 @@ export default function Chat() {
               border: '1px solid rgba(155,140,255,0.3)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <Heart size={13} fill="var(--primary)" color="var(--primary)" />
+              <Brain size={13} strokeWidth={2.5} color="var(--primary)" />
             </div>
             <div style={{
               background: 'var(--surface-2)',

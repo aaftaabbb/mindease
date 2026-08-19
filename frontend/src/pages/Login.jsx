@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Heart, Phone, Lock, User, ArrowRight, Loader, ChevronLeft, Mail, Eye, EyeOff, Check, X, Shield } from 'lucide-react';
+import { Brain, Phone, Lock, User, ArrowRight, Loader, ChevronLeft, Mail, Eye, EyeOff, Check, X, Shield } from 'lucide-react';
 
 function getPasswordStrength(pw) {
   if (!pw) return { score: 0, label: '', color: '' };
@@ -118,12 +118,12 @@ export default function Login() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 16px',
           }}>
-            <Heart size={26} fill="var(--primary)" color="var(--primary)" />
+            <Brain size={26} strokeWidth={2} color="var(--primary)" />
           </div>
           <h1 style={{
-            fontFamily: 'Playfair Display, serif',
-            fontSize: '1.8rem', fontWeight: 600,
-            color: 'var(--text)', letterSpacing: '-0.01em',
+            fontFamily: 'DM Sans, -apple-system, sans-serif',
+            fontSize: '1.8rem', fontWeight: 700,
+            color: 'var(--text)', letterSpacing: '-0.04em',
           }}>
             Mind<span style={{ color: 'var(--primary)' }}>Ease</span>
           </h1>

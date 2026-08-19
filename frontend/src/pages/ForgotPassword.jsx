@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Heart, Phone, Lock, ArrowRight, Loader, ChevronLeft, Eye, EyeOff, Check, X, Shield, RotateCcw } from 'lucide-react';
+import { Brain, Phone, Lock, ArrowRight, Loader, ChevronLeft, Eye, EyeOff, Check, X, Shield, RotateCcw } from 'lucide-react';
 
 function formatPhone(value) {
   const digits = value.replace(/\D/g, '').slice(0, 10);
@@ -79,12 +79,12 @@ export default function ForgotPassword() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 16px',
           }}>
-            <Heart size={26} fill="var(--primary)" color="var(--primary)" />
+            <Brain size={26} strokeWidth={2} color="var(--primary)" />
           </div>
           <h1 style={{
-            fontFamily: 'Playfair Display, serif',
-            fontSize: '1.8rem', fontWeight: 600,
-            color: 'var(--text)', letterSpacing: '-0.01em',
+            fontFamily: 'DM Sans, -apple-system, sans-serif',
+            fontSize: '1.8rem', fontWeight: 700,
+            color: 'var(--text)', letterSpacing: '-0.04em',
           }}>
             Mind<span style={{ color: 'var(--primary)' }}>Ease</span>
           </h1>
