@@ -1,25 +1,53 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Heart, Phone, Lock, User, ArrowRight, Loader, ChevronLeft, Mail } from 'lucide-react';
+import { Heart, Phone, Lock, User, ArrowRight, Loader, ChevronLeft, Mail, Eye, EyeOff, Check, X, Shield } from 'lucide-react';
+
+function getPasswordStrength(pw) {
+  if (!pw) return { score: 0, label: '', color: '' };
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if (/\d/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+  if (score <= 1) return { score, label: 'Weak', color: '#ff7b72', tips: 'Use uppercase, numbers & symbols' };
+  if (score <= 2) return { score, label: 'Fair', color: '#f5c97a', tips: 'Add more character types' };
+  if (score <= 3) return { score, label: 'Good', color: '#9b8cff', tips: 'Almost there!' };
+  return { score, label: 'Strong', color: '#5ecfaa', tips: '' };
+}
+
+function formatPhone(value) {
+  const digits = value.replace(/\D/g, '').slice(0, 10);
+  if (digits.length <= 5) return digits;
+  return `${digits.slice(0, 5)} ${digits.slice(5)}`;
+}
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [phoneTouched, setPhoneTouched] = useState(false);
   const navigate = useNavigate();
+
+  const phoneClean = phone.replace(/\s/g, '');
+  const isPhoneValid = /^\d{10}$/.test(phoneClean);
+  const strength = useMemo(() => getPasswordStrength(password), [password]);
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
+    if (!isPhoneValid) return;
     setLoading(true); setError('');
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, { phone });
+      await axios.post(`${import.meta.env.VITE_API_URL}/auth/send-otp`, { phone: phoneClean });
       setOtpSent(true);
     } catch (err) {
       setError(err.response?.data?.msg || 'Error sending OTP');
@@ -30,7 +58,9 @@ export default function Login() {
     e.preventDefault();
     setLoading(true); setError('');
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, { name, phone, email, password, otp });
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, {
+        name, phone: phoneClean, email, password, otp
+      });
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('role', res.data.user.role);
       window.dispatchEvent(new Event('storage'));
@@ -42,9 +72,10 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!isPhoneValid) { setError('Enter valid 10-digit phone'); return; }
     setLoading(true); setError('');
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { phone, password });
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { phone: phoneClean, password });
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('role', res.data.user.role);
       window.dispatchEvent(new Event('storage'));
@@ -147,8 +178,9 @@ export default function Login() {
               color: 'var(--crisis)',
               fontSize: '0.88rem',
               marginBottom: '20px',
+              display: 'flex', alignItems: 'center', gap: '8px',
             }}>
-              ⚠️ {error}
+              <X size={16} /> {error}
             </div>
           )}
 
@@ -156,7 +188,7 @@ export default function Login() {
             <div className="fade-in" style={{ marginBottom: '24px' }}>
               <button
                 onClick={() => setOtpSent(false)}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '12px' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '12px', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 <ChevronLeft size={15} /> Back
               </button>
@@ -168,31 +200,50 @@ export default function Login() {
                 color: 'var(--secondary)',
                 fontSize: '0.88rem',
               }}>
-                OTP sent to {phone}
+                OTP sent to {formatPhone(phone)}
               </div>
             </div>
           )}
 
           {isLogin && (
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-              <InputField icon={<Phone size={16} />} label="Phone Number" type="text"
-                value={phone} onChange={e => setPhone(e.target.value)} placeholder="Enter your phone number" />
-              <InputField icon={<Lock size={16} />} label="Password" type="password"
-                value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password" />
+              <PhoneInput
+                value={phone} onChange={v => setPhone(v)}
+                onBlur={() => setPhoneTouched(true)}
+                valid={isPhoneValid}
+                touched={phoneTouched}
+              />
+              <PasswordInput
+                value={password} onChange={v => setPassword(v)}
+                show={showPassword} toggleShow={() => setShowPassword(!showPassword)}
+                placeholder="Enter your password"
+              />
               <SubmitBtn loading={loading} label="Sign In" />
             </form>
           )}
 
           {!isLogin && !otpSent && (
             <form onSubmit={handleSendOtp} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-              <InputField icon={<User size={16} />} label="Full Name" type="text"
-                value={name} onChange={e => setName(e.target.value)} placeholder="Your name" />
-              <InputField icon={<Phone size={16} />} label="Phone Number" type="text"
-                value={phone} onChange={e => setPhone(e.target.value)} placeholder="Enter phone number" />
-              <InputField icon={<Mail size={16} />} label="Email (for booking notifications)" type="email"
-                value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" />
-              <InputField icon={<Lock size={16} />} label="Password" type="password"
-                value={password} onChange={e => setPassword(e.target.value)} placeholder="Create a password" />
+              <TextInput icon={<User size={16} />} label="Full Name"
+                value={name} onChange={v => setName(v)} placeholder="Your name" />
+              <PhoneInput
+                value={phone} onChange={v => setPhone(v)}
+                onBlur={() => setPhoneTouched(true)}
+                valid={isPhoneValid}
+                touched={phoneTouched}
+              />
+              <TextInput icon={<Mail size={16} />} label="Email (for booking notifications)" type="email"
+                value={email} onChange={v => setEmail(v)} placeholder="your@email.com" />
+              <div>
+                <PasswordInput
+                  value={password} onChange={v => setPassword(v)}
+                  show={showPassword} toggleShow={() => setShowPassword(!showPassword)}
+                  placeholder="Create a password"
+                />
+                {password.length > 0 && (
+                  <PasswordStrength strength={strength} />
+                )}
+              </div>
               <SubmitBtn loading={loading} label="Send OTP" />
             </form>
           )}
@@ -205,17 +256,18 @@ export default function Login() {
                 </label>
                 <input
                   type="text" maxLength={6}
-                  value={otp} onChange={e => setOtp(e.target.value)}
+                  value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
                   placeholder="••••••"
                   style={{
                     width: '100%', padding: '16px',
                     background: 'var(--surface-2)',
-                    border: '1px solid var(--glass-border)',
+                    border: `1px solid ${otp.length === 6 ? 'var(--secondary)' : 'var(--glass-border)'}`,
                     borderRadius: 'var(--radius-sm)',
                     color: 'var(--text)', fontSize: '1.4rem',
                     letterSpacing: '0.4em', textAlign: 'center',
                     fontFamily: 'monospace',
                     outline: 'none',
+                    transition: 'border-color 0.25s',
                   }}
                   required
                 />
@@ -226,16 +278,107 @@ export default function Login() {
 
         </div>
 
-        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '24px', lineHeight: 1.6 }}>
-          🔒 Your data is private and secure.
-        </p>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+          color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '20px',
+        }}>
+          <Shield size={12} /> Your data is private and secure. End-to-end encrypted.
+        </div>
 
       </div>
     </div>
   );
 }
 
-function InputField({ icon, label, type, value, onChange, placeholder, disabled }) {
+function PhoneInput({ value, onChange, onBlur, valid, touched }) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <div>
+      <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.88rem', fontWeight: 500, color: 'var(--text-soft)' }}>
+        Phone Number
+      </label>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '10px',
+        background: 'var(--surface-2)',
+        border: `1px solid ${touched && !valid ? 'var(--crisis)' : focused ? 'var(--primary)' : 'var(--glass-border)'}`,
+        borderRadius: 'var(--radius-sm)',
+        padding: '0 14px',
+        boxShadow: focused ? '0 0 0 3px var(--primary-dim)' : 'none',
+        transition: 'all 0.25s ease',
+      }}>
+        <span style={{ color: focused ? 'var(--primary)' : 'var(--text-muted)', flexShrink: 0, transition: 'color 0.25s', display: 'flex', alignItems: 'center' }}>
+          <Phone size={16} />
+        </span>
+        <input
+          type="text" inputMode="numeric"
+          value={value}
+          onChange={e => onChange(e.target.value.replace(/\D/g, '').slice(0, 10))}
+          onFocus={() => setFocused(true)} onBlur={() => { setFocused(false); onBlur?.(); }}
+          placeholder="98765 43210"
+          maxLength={11}
+          required
+          style={{
+            flex: 1, padding: '13px 0',
+            background: 'transparent', border: 'none', outline: 'none',
+            color: 'var(--text)', fontSize: '0.95rem', fontFamily: 'inherit',
+          }}
+        />
+        {touched && (
+          <span style={{ flexShrink: 0 }}>
+            {valid ? <Check size={16} color="var(--secondary)" /> : <X size={16} color="var(--crisis)" />}
+          </span>
+        )}
+      </div>
+      {touched && !valid && (
+        <p className="fade-in" style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'var(--crisis)' }}>
+          Enter valid 10-digit phone number
+        </p>
+      )}
+    </div>
+  );
+}
+
+function PasswordInput({ value, onChange, show, toggleShow, placeholder }) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <div>
+      <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.88rem', fontWeight: 500, color: 'var(--text-soft)' }}>
+        Password
+      </label>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '10px',
+        background: 'var(--surface-2)',
+        border: `1px solid ${focused ? 'var(--primary)' : 'var(--glass-border)'}`,
+        borderRadius: 'var(--radius-sm)',
+        padding: '0 14px',
+        boxShadow: focused ? '0 0 0 3px var(--primary-dim)' : 'none',
+        transition: 'all 0.25s ease',
+      }}>
+        <span style={{ color: focused ? 'var(--primary)' : 'var(--text-muted)', flexShrink: 0, transition: 'color 0.25s', display: 'flex', alignItems: 'center' }}>
+          <Lock size={16} />
+        </span>
+        <input
+          type={show ? 'text' : 'password'}
+          value={value} onChange={e => onChange(e.target.value)}
+          placeholder={placeholder}
+          onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+          required minLength={6}
+          style={{
+            flex: 1, padding: '13px 0',
+            background: 'transparent', border: 'none', outline: 'none',
+            color: 'var(--text)', fontSize: '0.95rem', fontFamily: 'inherit',
+          }}
+        />
+        <button type="button" onClick={toggleShow}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', flexShrink: 0, display: 'flex', alignItems: 'center', padding: 0 }}>
+          {show ? <EyeOff size={16} /> : <Eye size={16} />}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TextInput({ icon, label, type = 'text', value, onChange, placeholder }) {
   const [focused, setFocused] = useState(false);
   return (
     <div>
@@ -250,14 +393,13 @@ function InputField({ icon, label, type, value, onChange, placeholder, disabled 
         padding: '0 14px',
         boxShadow: focused ? '0 0 0 3px var(--primary-dim)' : 'none',
         transition: 'all 0.25s ease',
-        opacity: disabled ? 0.5 : 1,
       }}>
-        <span style={{ color: focused ? 'var(--primary)' : 'var(--text-muted)', flexShrink: 0, transition: 'color 0.25s' }}>
+        <span style={{ color: focused ? 'var(--primary)' : 'var(--text-muted)', flexShrink: 0, transition: 'color 0.25s', display: 'flex', alignItems: 'center' }}>
           {icon}
         </span>
         <input
-          type={type} value={value} onChange={onChange}
-          placeholder={placeholder} disabled={disabled} required
+          type={type} value={value} onChange={e => onChange(e.target.value)}
+          placeholder={placeholder} required
           onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
           style={{
             flex: 1, padding: '13px 0',
@@ -265,6 +407,33 @@ function InputField({ icon, label, type, value, onChange, placeholder, disabled 
             color: 'var(--text)', fontSize: '0.95rem', fontFamily: 'inherit',
           }}
         />
+      </div>
+    </div>
+  );
+}
+
+function PasswordStrength({ strength }) {
+  const segments = 5;
+  return (
+    <div className="fade-in" style={{ marginTop: '10px' }}>
+      <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
+        {Array.from({ length: segments }).map((_, i) => (
+          <div key={i} style={{
+            flex: 1, height: '4px', borderRadius: '2px',
+            background: i < strength.score ? strength.color : 'var(--surface-3)',
+            transition: 'background 0.3s ease',
+          }} />
+        ))}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: '0.75rem', color: strength.color, fontWeight: 600 }}>
+          {strength.label}
+        </span>
+        {strength.tips && (
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+            {strength.tips}
+          </span>
+        )}
       </div>
     </div>
   );

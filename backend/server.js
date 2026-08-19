@@ -28,7 +28,16 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
+
+app.use((req, res, next) => {
+  res.setTimeout(10000, () => {
+    if (!res.headersSent) {
+      res.status(504).json({ msg: 'Request timeout, please try again' });
+    }
+  });
+  next();
+});
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -60,7 +69,11 @@ app.use('/api/clinic',   require('./routes/clinic'));
 app.use('/api/booking',  require('./routes/booking'));
 app.use('/api/admin',    require('./routes/admin'));
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  maxPoolSize: 10,
+})
   .then(async () => {
     console.log('MongoDB Connected');
     await seedData();

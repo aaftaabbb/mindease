@@ -6,4 +6,6 @@ const OTPSchema = new mongoose.Schema({
   expiresAt: { type: Date,   required: true }
 }, { timestamps: true });
 
+OTPSchema.index({ phone: 1 }, { expireAfterSeconds: 600 });
+
 module.exports = mongoose.model('OTP', OTPSchema);
