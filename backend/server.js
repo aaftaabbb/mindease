@@ -6,6 +6,8 @@ require('dotenv').config();
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 // Manual CORS middleware — must be FIRST
 app.use((req, res, next) => {
   const allowedOrigins = [
