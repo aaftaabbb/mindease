@@ -22,7 +22,7 @@ router.post('/', auth, async (req, res) => {
     try {
       const model = genAI.getGenerativeModel({
         model: 'gemini-3.6-flash',
-        systemInstruction: 'You are a gentle, supportive mental wellness companion. Give a short 1-2 sentence reflection on the user\'s journal entry. Be warm, validating, and encouraging. Use simple language. Sometimes use Hindi words like "sab theek hoga" or "bilkul".'
+        systemInstruction: 'You are a close friend reading someone\'s private journal. Write a short 1-2 sentence reflection — warm but genuine, not generic. React to what they actually wrote. Never use forced phrases like "sab theek hoga". Keep it real and human.'
       });
       const result = await model.generateContent(`My mood: ${mood}\n\nJournal entry: ${content}`);
       reflection = result.response.text();
