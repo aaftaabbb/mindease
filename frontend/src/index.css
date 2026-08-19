@@ -284,6 +284,11 @@ h1, h2, h3, h4 {
   .footer { padding-bottom: 80px; }
 }
 
+/* ── Bottom nav (mobile only) ── */
+@media (min-width: 769px) {
+  .bottom-nav { display: none !important; }
+}
+
 /* ── Modals ── */
 .modal-overlay {
   position: fixed;
