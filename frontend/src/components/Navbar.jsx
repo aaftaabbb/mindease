@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Heart, MessageCircle, BarChart2, Wind, Sparkles, Building, BookOpen, LogOut, LayoutDashboard, Users, AlertOctagon, Menu, X } from 'lucide-react';
+import { Heart, MessageCircle, BarChart2, Wind, Sparkles, Building, BookOpen, LogOut, LayoutDashboard, Users, AlertOctagon, Menu, X, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Navbar({ token, userRole }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -33,6 +35,7 @@ export default function Navbar({ token, userRole }) {
               <Link to="/chat"         className={`nav-link ${isActive('/chat')}`}         onClick={close}><MessageCircle size={16}/> Chat</Link>
               <Link to="/mood"         className={`nav-link ${isActive('/mood')}`}         onClick={close}><BarChart2 size={16}/> Mood</Link>
               <Link to="/journal"      className={`nav-link ${isActive('/journal')}`}      onClick={close}><BookOpen size={16}/> Journal</Link>
+              <Link to="/articles"     className={`nav-link ${isActive('/articles')}`}     onClick={close}><BookOpen size={16}/> Learn</Link>
               <Link to="/breathing"    className={`nav-link ${isActive('/breathing')}`}    onClick={close}><Wind size={16}/> Breathe</Link>
               <Link to="/affirmations" className={`nav-link ${isActive('/affirmations')}`} onClick={close}><Sparkles size={16}/> Affirmations</Link>
               <Link to="/clinics"      className={`nav-link ${isActive('/clinics')}`}      onClick={close}><Building size={16}/> Clinics</Link>
@@ -58,9 +61,19 @@ export default function Navbar({ token, userRole }) {
           )}
         </div>
 
-        <button className="nav-hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="Toggle menu">
-          {menuOpen ? <X size={20} color="var(--text-soft)" /> : <Menu size={20} color="var(--text-soft)" />}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button onClick={toggleTheme} style={{
+            width: '36px', height: '36px', borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--surface-2)', border: '1px solid var(--glass-border)',
+            color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.25s',
+          }} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+          <button className="nav-hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="Toggle menu">
+            {menuOpen ? <X size={20} color="var(--text-soft)" /> : <Menu size={20} color="var(--text-soft)" />}
+          </button>
+        </div>
 
       </div>
     </nav>

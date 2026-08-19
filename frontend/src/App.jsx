@@ -11,6 +11,7 @@ import Breathing from './pages/Breathing';
 import Affirmations from './pages/Affirmations';
 import Clinics from './pages/Clinics';
 import Journal from './pages/Journal';
+import Articles from './pages/Articles';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCrisis from './pages/admin/AdminCrisis';
@@ -50,6 +51,7 @@ function App() {
           <Route path="/affirmations" element={<ProtectedRoute token={token} userRole={userRole}><Affirmations /></ProtectedRoute>} />
           <Route path="/clinics" element={<ProtectedRoute token={token} userRole={userRole}><Clinics /></ProtectedRoute>} />
           <Route path="/journal" element={<ProtectedRoute token={token} userRole={userRole}><Journal /></ProtectedRoute>} />
+          <Route path="/articles" element={<ProtectedRoute token={token} userRole={userRole}><Articles /></ProtectedRoute>} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<ProtectedRoute token={token} userRole={userRole} roleRequired="admin"><AdminDashboard /></ProtectedRoute>} />

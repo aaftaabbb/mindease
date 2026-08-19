@@ -40,6 +40,28 @@
   --radius-xl:     28px;
 }
 
+/* ── Light Theme ── */
+[data-theme="light"] {
+  --bg:            #f4f5f9;
+  --bg-2:          #eef0f6;
+  --surface:       #ffffff;
+  --surface-2:     #f0f1f6;
+  --surface-3:     #e5e7ee;
+
+  --text:          #1a1f30;
+  --text-muted:    #6b7294;
+  --text-soft:     #4a5068;
+
+  --glass-bg:      rgba(0, 0, 0, 0.03);
+  --glass-bg-2:    rgba(0, 0, 0, 0.05);
+  --glass-border:  rgba(0, 0, 0, 0.08);
+  --glass-border-2:rgba(0, 0, 0, 0.13);
+
+  --shadow-sm:     0 2px 12px rgba(0,0,0,0.06);
+  --shadow-md:     0 8px 32px rgba(0,0,0,0.08);
+  --shadow-glow:   0 0 40px rgba(155, 140, 255, 0.08);
+}
+
 /* ── Reset ── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -57,11 +79,14 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* Subtle radial ambient */
   background-image:
     radial-gradient(ellipse 80% 50% at 20% 0%, rgba(155,140,255,0.07) 0%, transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 100%, rgba(94,207,170,0.05) 0%, transparent 55%);
   background-attachment: fixed;
+}
+
+[data-theme="light"] body {
+  background-image: none;
 }
 
 #root {
