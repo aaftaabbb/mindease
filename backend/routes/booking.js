@@ -87,7 +87,7 @@ router.delete('/:id', auth, async (req, res) => {
     ).populate('clinic', 'name city');
     if (!booking) return res.status(404).json({ msg: 'Booking not found or cannot be cancelled' });
 
-    if (booking.email) {
+    if (booking.email && booking.clinic) {
       sendBookingCancellation({
         to: booking.email,
         userName: 'User',

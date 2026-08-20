@@ -32,7 +32,7 @@ router.post('/', auth, async (req, res) => {
     // Gemini reflection in background — don't block the response
     try {
       const model = genAI.getGenerativeModel({
-        model: 'gemini-3.6-flash',
+        model: 'gemini-2.5-flash',
         systemInstruction: 'You are a close friend reading someone\'s private journal. Write a short 1-2 sentence reflection — warm but genuine, not generic. React to what they actually wrote. Keep it real and human.'
       });
       const result = await model.generateContent(`My mood: ${mood}\n\nJournal entry: ${content}`);

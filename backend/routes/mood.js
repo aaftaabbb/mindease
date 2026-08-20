@@ -15,7 +15,7 @@ router.post('/', auth, async (req, res) => {
     const log = await MoodLog.create({ user: req.user.id, mood, note: note || '' });
     res.status(201).json(log);
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -24,7 +24,7 @@ router.get('/history', auth, async (req, res) => {
     const logs = await MoodLog.find({ user: req.user.id }).sort({ createdAt: -1 }).limit(30);
     res.json(logs);
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -37,7 +37,7 @@ router.get('/stats', auth, async (req, res) => {
     }
     res.json(stats);
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -96,7 +96,7 @@ router.get('/streak', auth, async (req, res) => {
 
     res.json({ currentStreak, longestStreak, totalEntries, todayLogged });
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 

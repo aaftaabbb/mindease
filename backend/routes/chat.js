@@ -191,6 +191,11 @@ router.post('/message', auth, async (req, res) => {
 
     const aiResponse = await getGeminiResponse(cleanMessage, chat.messages.slice(-10));
 
+    // Save history in background
+    chat.messages.push({ role: 'user', content: cleanMessage, isCrisis: false });
+    chat.messages.push({ role: 'assistant', content: aiResponse, isCrisis: false });
+    chat.save().catch(() => {});
+
     return res.json({ response: aiResponse, isCrisis: false });
   } catch (err) {
     console.error('Chat error:', err.message);
@@ -206,7 +211,7 @@ router.get('/history', auth, async (req, res) => {
     return res.json(chat ? chat.messages.slice(-20) : []);
   } catch (err) {
     console.error('History error:', err);
-    return res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) return res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -216,7 +221,7 @@ router.delete('/clear', auth, async (req, res) => {
     return res.json({ msg: 'Chat cleared' });
   } catch (err) {
     console.error('Clear chat error:', err);
-    return res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) return res.status(500).json({ msg: 'Server error' });
   }
 });
 

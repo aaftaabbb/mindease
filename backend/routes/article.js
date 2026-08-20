@@ -8,10 +8,11 @@ router.get('/', async (req, res) => {
     if (category) filter.category = category;
     if (featured === 'true') filter.featured = true;
     if (search) {
+      const safe = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { excerpt: { $regex: search, $options: 'i' } },
-        { tags: { $in: [new RegExp(search, 'i')] } }
+        { title: { $regex: safe, $options: 'i' } },
+        { excerpt: { $regex: safe, $options: 'i' } },
+        { tags: { $in: [new RegExp(safe, 'i')] } }
       ];
     }
     const articles = await Article.find(filter).sort({ createdAt: -1 }).select('-content');
