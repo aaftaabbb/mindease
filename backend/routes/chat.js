@@ -107,39 +107,60 @@ Be genuine, relevant, calm and conversational.
     { role: 'user', parts: [{ text: message }] }
   ];
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 45000);
+  const body = JSON.stringify({
+    systemInstruction: { parts: [{ text: systemInstruction }] },
+    contents,
+    generationConfig: { maxOutputTokens: 300, temperature: 0.75, topP: 0.9 }
+  });
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: controller.signal,
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents,
-        generationConfig: { maxOutputTokens: 300, temperature: 0.75, topP: 0.9 }
-      })
-    });
+  const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
 
-    clearTimeout(timeout);
-    const data = await response.json();
+  for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
 
-    if (!response.ok) {
-      console.error('Gemini API Error:', response.status, data);
-      throw new Error(`Gemini API Error ${response.status}`);
+      try {
+        const modelUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
+        const response = await fetch(modelUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body
+        });
+        clearTimeout(timeout);
+
+        const data = await response.json();
+
+        if (response.status === 503 || response.status === 429) {
+          console.log(`${model} unavailable (attempt ${attempt + 1}), retrying...`);
+          if (attempt === 0) await new Promise(r => setTimeout(r, 2000));
+          continue;
+        }
+
+        if (!response.ok) {
+          console.error('Gemini API Error:', response.status, data);
+          break;
+        }
+
+        if (!data.candidates?.[0]?.content?.parts?.[0]) {
+          console.error('Unexpected Gemini response:', data);
+          break;
+        }
+
+        return data.candidates[0].content.parts[0].text.trim();
+      } catch (err) {
+        clearTimeout(timeout);
+        if (err.name === 'AbortError') {
+          console.log(`${model} timeout (attempt ${attempt + 1})`);
+          continue;
+        }
+        throw err;
+      }
     }
-
-    if (!data.candidates?.[0]?.content?.parts?.[0]) {
-      console.error('Unexpected Gemini response:', data);
-      throw new Error('Invalid response from Gemini');
-    }
-
-    return data.candidates[0].content.parts[0].text.trim();
-  } catch (err) {
-    clearTimeout(timeout);
-    throw err;
   }
+
+  throw new Error('All Gemini models failed');
 }
 
 router.post('/message', auth, async (req, res) => {
