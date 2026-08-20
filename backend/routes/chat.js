@@ -45,14 +45,14 @@ router.post('/message', auth, async (req, res) => {
     let chat = await Chat.findOne({ user: req.user.id });
     if (!chat) chat = await Chat.create({ user: req.user.id, messages: [] });
 
-    const recentMessages = chat.messages.slice(-10).map(m => ({
+    const recentMessages = chat.messages.slice(-5).map(m => ({
       role: m.role,
       content: m.content
     }));
 
     const model = genAI.getGenerativeModel({
       model: 'gemini-3.6-flash',
-      systemInstruction: 'You are a warm, genuine friend having a real conversation. Talk like a close friend who truly cares — not a therapist, not a chatbot. Be direct, honest, and human. Use casual natural language. Match the user\'s energy — if they\'re upset, be gentle. If they\'re casual, be relaxed. Never use forced phrases like "sab theek hoga" or "yaar" unless the user uses them first. Never sound scripted or robotic. Keep responses to 2-3 sentences max. Never say "I understand" or "I\'m here for you" — show it through what you say instead.'
+      systemInstruction: 'You are a warm genuine friend. Be direct, honest, human. Match their energy. Keep responses 1-2 sentences max. Never say "I understand" or "I\'m here for you".'
     });
 
     const history = recentMessages.map(m => ({
@@ -60,8 +60,11 @@ router.post('/message', auth, async (req, res) => {
       parts: [{ text: m.content }]
     }));
 
-    const chatSession = model.startChat({ history });
-    const result = await withTimeout(chatSession.sendMessage(message), 30000, 'Gemini');
+    const chatSession = model.startChat({
+      history,
+      generationConfig: { maxOutputTokens: 150, temperature: 0.7 }
+    });
+    const result = await withTimeout(chatSession.sendMessage(message), 20000, 'Gemini');
     const response = result.response.text();
 
     if (res.headersSent) return;
