@@ -18,28 +18,27 @@ router.post('/', auth, async (req, res) => {
       return res.status(400).json({ msg: 'Content too long (max 2000 characters)' });
     }
 
-    let reflection = '';
-    try {
-      const model = genAI.getGenerativeModel({
-        model: 'gemini-3.6-flash',
-        systemInstruction: 'You are a close friend reading someone\'s private journal. Write a short 1-2 sentence reflection — warm but genuine, not generic. React to what they actually wrote. Never use forced phrases like "sab theek hoga". Keep it real and human.'
-      });
-      const result = await model.generateContent(`My mood: ${mood}\n\nJournal entry: ${content}`);
-      reflection = result.response.text();
-    } catch (e) {
-      reflection = 'Thank you for sharing. Keep writing, it helps! 💜';
-    }
-
     const entry = await Journal.create({
       user: req.user.id,
       title: title.trim(),
       content: content.trim(),
       mood: mood || 'neutral',
       tags: Array.isArray(tags) ? tags.slice(0, 5) : [],
-      reflection
+      reflection: ''
     });
 
     res.status(201).json(entry);
+
+    // Gemini reflection in background — don't block the response
+    try {
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-3.6-flash',
+        systemInstruction: 'You are a close friend reading someone\'s private journal. Write a short 1-2 sentence reflection — warm but genuine, not generic. React to what they actually wrote. Keep it real and human.'
+      });
+      const result = await model.generateContent(`My mood: ${mood}\n\nJournal entry: ${content}`);
+      const reflection = result.response.text();
+      await Journal.findByIdAndUpdate(entry._id, { reflection });
+    } catch (_) {}
   } catch (err) {
     console.error('Journal error:', err);
     if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
