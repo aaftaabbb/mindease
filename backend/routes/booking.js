@@ -49,15 +49,20 @@ router.post('/', auth, async (req, res) => {
     const populated = await booking.populate('clinic', 'name city phone type');
 
     const user = await User.findById(req.user.id);
-    sendBookingConfirmation({
-      to: email,
-      userName: user ? user.name : 'User',
-      clinicName: clinic.name,
-      city: clinic.city,
-      date: bookingDate,
-      time,
-      reason: reason || ''
-    }).catch(err => console.error('Email send failed:', err.message));
+    try {
+      await sendBookingConfirmation({
+        to: email,
+        userName: user ? user.name : 'User',
+        clinicName: clinic.name,
+        city: clinic.city,
+        date: bookingDate,
+        time,
+        reason: reason || ''
+      });
+      console.log('Booking confirmation email sent to:', email);
+    } catch (emailErr) {
+      console.error('Booking email failed:', emailErr.message);
+    }
 
     res.status(201).json(populated);
   } catch (err) {
