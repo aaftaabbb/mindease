@@ -113,12 +113,12 @@ Be genuine, relevant, calm and conversational.
     generationConfig: { maxOutputTokens: 300, temperature: 0.75, topP: 0.9 }
   });
 
-  const models = ['gemini-3.6-flash', 'gemini-2.5-flash'];
+  const models = ['gemini-2.5-flash', 'gemini-1.5-flash'];
 
   for (const model of models) {
-    for (let attempt = 0; attempt < 2; attempt++) {
+    for (let attempt = 0; attempt < 3; attempt++) {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 30000);
+      const timeout = setTimeout(() => controller.abort(), 45000);
 
       try {
         const modelUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
@@ -133,8 +133,8 @@ Be genuine, relevant, calm and conversational.
         const data = await response.json();
 
         if (response.status === 503 || response.status === 429) {
-          console.log(`${model} unavailable (attempt ${attempt + 1}), retrying...`);
-          if (attempt === 0) await new Promise(r => setTimeout(r, 2000));
+          console.log(`${model} unavailable (attempt ${attempt + 1}), retrying in 3s...`);
+          await new Promise(r => setTimeout(r, 3000));
           continue;
         }
 
