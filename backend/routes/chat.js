@@ -113,7 +113,7 @@ Be genuine, relevant, calm and conversational.
     generationConfig: { maxOutputTokens: 300, temperature: 0.75, topP: 0.9 }
   });
 
-  const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+  const models = ['gemini-3.6-flash', 'gemini-2.5-flash'];
 
   for (const model of models) {
     for (let attempt = 0; attempt < 2; attempt++) {
