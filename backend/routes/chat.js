@@ -8,27 +8,30 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const CRISIS_KEYWORDS = ['suicide','kill myself','end my life','self harm','hurt myself','hopeless','cant go on','want to die','no point','jeena nahi'];
 
 router.post('/message', auth, async (req, res) => {
-  try {
-    const { message } = req.body;
-    if (!message || typeof message !== 'string' || message.trim().length === 0) {
-      return res.status(400).json({ msg: 'Message required' });
-    }
-    if (message.length > 1000) {
-      return res.status(400).json({ msg: 'Message too long (max 1000 characters)' });
-    }
+  const { message } = req.body;
+  if (!message || typeof message !== 'string' || message.trim().length === 0) {
+    return res.status(400).json({ msg: 'Message required' });
+  }
+  if (message.length > 1000) {
+    return res.status(400).json({ msg: 'Message too long (max 1000 characters)' });
+  }
 
-    const isCrisis = CRISIS_KEYWORDS.some(k => message.toLowerCase().includes(k));
+  const isCrisis = CRISIS_KEYWORDS.some(k => message.toLowerCase().includes(k));
 
-    let chat = await Chat.findOne({ user: req.user.id });
-    if (!chat) chat = await Chat.create({ user: req.user.id, messages: [] });
-
-    if (isCrisis) {
-      const emergencyResponse = 'I can hear that you are going through something very difficult. Please reach out immediately — iCall: 9152987821. You are not alone. 💙';
+  if (isCrisis) {
+    const emergencyResponse = 'I can hear that you are going through something very difficult. Please reach out immediately — iCall: 9152987821. You are not alone. 💙';
+    try {
+      const chat = await Chat.findOne({ user: req.user.id }) || await Chat.create({ user: req.user.id, messages: [] });
       chat.messages.push({ role: 'user', content: message, isCrisis: true });
       chat.messages.push({ role: 'assistant', content: emergencyResponse, isCrisis: true });
       await chat.save();
-      return res.json({ response: emergencyResponse, isCrisis: true });
-    }
+    } catch (_) {}
+    return res.json({ response: emergencyResponse, isCrisis: true });
+  }
+
+  try {
+    let chat = await Chat.findOne({ user: req.user.id });
+    if (!chat) chat = await Chat.create({ user: req.user.id, messages: [] });
 
     const recentMessages = chat.messages.slice(-10).map(m => ({
       role: m.role,
@@ -49,11 +52,13 @@ router.post('/message', auth, async (req, res) => {
     const result = await chatSession.sendMessage(message);
     const response = result.response.text();
 
+    // Send response FIRST, save to DB in background
+    res.json({ response, isCrisis: false });
+
+    // Background save — don't block the response
     chat.messages.push({ role: 'user', content: message, isCrisis: false });
     chat.messages.push({ role: 'assistant', content: response, isCrisis: false });
-    await chat.save();
-
-    res.json({ response, isCrisis: false });
+    chat.save().catch(err => console.error('Chat save error:', err));
   } catch (err) {
     console.error('Chat error:', err);
     if (!res.headersSent) {
