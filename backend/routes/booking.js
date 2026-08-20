@@ -49,25 +49,21 @@ router.post('/', auth, async (req, res) => {
     const populated = await booking.populate('clinic', 'name city phone type');
 
     const user = await User.findById(req.user.id);
-    try {
-      await sendBookingConfirmation({
-        to: email,
-        userName: user ? user.name : 'User',
-        clinicName: clinic.name,
-        city: clinic.city,
-        date: bookingDate,
-        time,
-        reason: reason || ''
-      });
-      console.log('Booking confirmation email sent to:', email);
-    } catch (emailErr) {
-      console.error('Booking email failed:', emailErr.message);
-    }
+    sendBookingConfirmation({
+      to: email,
+      userName: user ? user.name : 'User',
+      clinicName: clinic.name,
+      city: clinic.city,
+      date: bookingDate,
+      time,
+      reason: reason || ''
+    }).then(() => console.log('Booking email sent to:', email))
+      .catch(err => console.error('Booking email failed:', err.message));
 
     res.status(201).json(populated);
   } catch (err) {
     console.error('Booking error:', err);
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -78,7 +74,7 @@ router.get('/', auth, async (req, res) => {
       .sort({ date: -1 });
     res.json(bookings);
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -103,7 +99,7 @@ router.delete('/:id', auth, async (req, res) => {
 
     res.json({ msg: 'Booking cancelled', booking });
   } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    if (!res.headersSent) res.status(500).json({ msg: 'Server error' });
   }
 });
 
