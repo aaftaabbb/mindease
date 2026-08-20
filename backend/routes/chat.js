@@ -7,7 +7,19 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const CRISIS_KEYWORDS = ['suicide','kill myself','end my life','self harm','hurt myself','hopeless','cant go on','want to die','no point','jeena nahi'];
 
+function withTimeout(promise, ms, label) {
+  let timer;
+  return Promise.race([
+    promise.finally(() => clearTimeout(timer)),
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`${label} timeout after ${ms}ms`)), ms);
+    })
+  ]);
+}
+
 router.post('/message', auth, async (req, res) => {
+  if (res.headersSent) return;
+
   const { message } = req.body;
   if (!message || typeof message !== 'string' || message.trim().length === 0) {
     return res.status(400).json({ msg: 'Message required' });
@@ -49,20 +61,22 @@ router.post('/message', auth, async (req, res) => {
     }));
 
     const chatSession = model.startChat({ history });
-    const result = await chatSession.sendMessage(message);
+    const result = await withTimeout(chatSession.sendMessage(message), 30000, 'Gemini');
     const response = result.response.text();
 
-    // Send response FIRST, save to DB in background
+    if (res.headersSent) return;
     res.json({ response, isCrisis: false });
 
-    // Background save — don't block the response
     chat.messages.push({ role: 'user', content: message, isCrisis: false });
     chat.messages.push({ role: 'assistant', content: response, isCrisis: false });
-    chat.save().catch(err => console.error('Chat save error:', err));
+    chat.save().catch(() => {});
   } catch (err) {
-    console.error('Chat error:', err);
+    console.error('Chat error:', err.message);
     if (!res.headersSent) {
-      res.status(500).json({ msg: 'Server error' });
+      const msg = err.message?.includes('timeout')
+        ? 'AI is taking too long, please try again.'
+        : 'Server error';
+      res.status(500).json({ msg });
     }
   }
 });

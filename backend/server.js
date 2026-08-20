@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '1mb' }));
 
 app.use((req, res, next) => {
-  res.setTimeout(10000, () => {
+  res.setTimeout(60000, () => {
     if (!res.headersSent) {
       res.status(504).json({ msg: 'Request timeout, please try again' });
     }
