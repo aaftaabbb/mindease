@@ -31,7 +31,7 @@ async function callGemini(message, history) {
   const GEMINI_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_KEY) throw new Error('GEMINI_API_KEY missing');
 
-  const models = ['gemini-2.5-flash', 'gemini-1.5-flash'];
+  const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
 
   const contents = [
     ...history.slice(-10).map(m => ({
@@ -118,7 +118,7 @@ router.post('/message', auth, async (req, res) => {
 
     if (!aiResponse) {
       return res.json({
-        response: "I'm having trouble connecting right now. But I'm here — can you tell me more about what's on your mind?",
+        response: "I'm having a little trouble connecting right now — too many people talking to me at once! Give it a minute and try again. I'm not going anywhere.",
         isCrisis: false
       });
     }
