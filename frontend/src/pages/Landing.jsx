@@ -296,7 +296,7 @@ function FeatureCard({ feature, delay }) {
         {feature.icon}
       </div>
       <h3 style={{
-        fontSize: '1.05rem', fontFamily: 'DM Sans, sans-serif',
+        fontSize: '1.05rem', fontFamily: 'Outfit, sans-serif',
         fontWeight: 700, marginBottom: '8px', color: 'var(--text)',
         letterSpacing: '-0.02em',
       }}>

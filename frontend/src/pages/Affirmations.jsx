@@ -179,7 +179,7 @@ export default function Affirmations() {
               fontSize: '5rem', lineHeight: 0.8,
               color: 'var(--accent)', opacity: 0.10,
               fontFamily: 'Georgia, serif', userSelect: 'none',
-            }}>\u201C</div>
+            }}>&ldquo;</div>
 
             {/* Decorative closing quote */}
             <div style={{
@@ -187,7 +187,7 @@ export default function Affirmations() {
               fontSize: '5rem', lineHeight: 0.8,
               color: 'var(--accent)', opacity: 0.10,
               fontFamily: 'Georgia, serif', userSelect: 'none',
-            }}>\u201D</div>
+            }}>&rdquo;</div>
 
             <p style={{
               fontSize: 'clamp(1.3rem, 3.5vw, 2rem)',
