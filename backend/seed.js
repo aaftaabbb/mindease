@@ -1,5 +1,3 @@
-const bcrypt = require('bcryptjs');
-
 module.exports = async function seedData() {
   const Clinic = require('./models/Clinic');
   const User = require('./models/User');
@@ -80,13 +78,18 @@ module.exports = async function seedData() {
 
     const adminPhone = process.env.ADMIN_PHONE || '9999999999';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin1234';
-    const adminExists = await User.findOne({ phone: adminPhone });
+    const adminExists = await User.findOne({ phone: adminPhone, role: 'admin' });
     if (!adminExists) {
-      const hashed = await bcrypt.hash(adminPassword, 10);
       await User.create({
-        name: 'Admin', phone: adminPhone, password: hashed, role: 'admin', isVerified: true
+        name: 'Admin', phone: adminPhone, password: adminPassword, role: 'admin', isVerified: true
       });
       console.log('Admin seeded');
+    } else if (adminExists.password.length > 60) {
+      await User.deleteOne({ _id: adminExists._id });
+      await User.create({
+        name: 'Admin', phone: adminPhone, password: adminPassword, role: 'admin', isVerified: true
+      });
+      console.log('Admin re-seeded (was double-hashed)');
     }
   } catch (err) {
     console.error('Seed error:', err.message);
