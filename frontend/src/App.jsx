@@ -40,7 +40,7 @@ function App() {
   return (
     <Router>
       <Navbar token={token} userRole={userRole} />
-      {token && <Sidebar token={token} userRole={userRole} />}
+      <Sidebar token={token} userRole={userRole} />
       <div className="main-content" style={token ? { marginLeft: '220px' } : {}}>
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -68,7 +68,7 @@ function App() {
           Built by three sleep-deprived students — <strong style={{ color: 'var(--primary)' }}>Aftab, Adarsh & Ambar</strong>
         </p>
       </footer>
-      {token && <BottomNav />}
+      <BottomNav token={token} />
       <SOSButton />
     </Router>
   );

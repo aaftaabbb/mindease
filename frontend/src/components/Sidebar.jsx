@@ -35,8 +35,6 @@ export default function Sidebar({ token, userRole }) {
 
   const links = userRole === 'admin' ? adminLinks : userLinks;
 
-  if (!token) return null;
-
   return (
     <aside style={{
       width: '220px',
@@ -56,7 +54,7 @@ export default function Sidebar({ token, userRole }) {
         {links.map((link) => (
           <Link
             key={link.to}
-            to={link.to}
+            to={token ? link.to : '/login'}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -109,19 +107,30 @@ export default function Sidebar({ token, userRole }) {
           {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
           {theme === 'dark' ? 'Light' : 'Dark'} Mode
         </button>
-        <button
-          onClick={handleLogout}
-          style={{
+        {token ? (
+          <button
+            onClick={handleLogout}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '12px',
+              padding: '11px 16px', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 500,
+              color: 'var(--text-muted)', transition: 'all 0.2s ease', width: '100%', textAlign: 'left',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--crisis-dim)'; e.currentTarget.style.color = 'var(--crisis)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+          >
+            <LogOut size={20} />
+            Logout
+          </button>
+        ) : (
+          <Link to="/login" style={{
             display: 'flex', alignItems: 'center', gap: '12px',
             padding: '11px 16px', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 500,
-            color: 'var(--text-muted)', transition: 'all 0.2s ease', width: '100%', textAlign: 'left',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'var(--crisis-dim)'; e.currentTarget.style.color = 'var(--crisis)'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
-        >
-          <LogOut size={20} />
-          Logout
-        </button>
+            color: 'var(--primary)', textDecoration: 'none', transition: 'all 0.2s ease',
+          }}>
+            <LogOut size={20} />
+            Login
+          </Link>
+        )}
       </div>
     </aside>
   );

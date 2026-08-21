@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { MessageCircle, BarChart2, BookOpen, Wind, Building } from 'lucide-react';
 
-export default function BottomNav() {
+export default function BottomNav({ token }) {
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
 
@@ -33,7 +33,7 @@ export default function BottomNav() {
       {tabs.map((tab) => (
         <Link
           key={tab.to}
-          to={tab.to}
+          to={token ? tab.to : '/login'}
           style={{
             display: 'flex',
             flexDirection: 'column',
