@@ -34,7 +34,7 @@ async function callGemini(message, history) {
   const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
 
   const contents = [
-    ...history.slice(-10).map(m => ({
+    ...history.slice(-6).map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }]
     })),
@@ -44,7 +44,7 @@ async function callGemini(message, history) {
   const payload = {
     systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
     contents,
-    generationConfig: { maxOutputTokens: 300, temperature: 0.75, topP: 0.9 }
+    generationConfig: { maxOutputTokens: 600, temperature: 0.75, topP: 0.9 }
   };
 
   for (const model of models) {
