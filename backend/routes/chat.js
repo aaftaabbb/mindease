@@ -31,7 +31,7 @@ async function callGemini(message, history) {
   const GEMINI_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_KEY) throw new Error('GEMINI_API_KEY missing');
 
-  const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+  const models = ['gemini-2.5-flash', 'gemini-2.5-pro'];
 
   const contents = [
     ...history.slice(-6).map(m => ({
